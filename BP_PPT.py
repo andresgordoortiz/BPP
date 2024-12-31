@@ -41,30 +41,30 @@ def bppt_bpscore(cbps):
         if i in PWMBP:
             cbpsc = cbpsc*PWMBP[i][cbpsN[i]]
         else:
-            print "Error: the input bps is longer than the PWM"
+            print("Error: the input bps is longer than the PWM")
     return(cbpsc)
 
 def bppt_get_bpscore(l,basebp):
     nn = ['A','C','G','T'] # nucleotides
     NNS = ['A','C','G','T'] #  nucleotides combination with fixed length
     NN = [] #  nucleotides combination with fixed length
-    
+
     for i in range(2,l+1):
         for nns in NNS:
             for n in nn:
                 newN = nns+n
                 NN.append(newN)
-        NNS = NN 
+        NNS = NN
         NN = []
 
     basebpsc = bppt_bpscore(basebp)
     cBPSC = {}
     for nn in NNS:
         cBPSC[nn] = bppt_bpscore(nn)/basebpsc
-    
+
     return(cBPSC)
 
-def bppt_get_AGEZ(seq,offset=12,maxL=-1): # get the AGEZ 
+def bppt_get_AGEZ(seq,offset=12,maxL=-1): # get the AGEZ
     sL = len(seq)
     ss = seq[0:-offset].split("AG")
     if maxL > 0:
@@ -99,7 +99,7 @@ def bppt_dis_pro(pAG,offset=22,interval=4):#4 best
     #return(1/(abs(math.log(float(pAG)/offset))/interval+1))
 
 def bppt_get_BPPTsc(seq,maxL,baseppt): # get the candidate bps and ppt and their score
-    
+
     lmotif = 7
     lppt = 8
     l_max_ppt = 20
@@ -114,8 +114,8 @@ def bppt_get_BPPTsc(seq,maxL,baseppt): # get the candidate bps and ppt and their
     orinp = []
     orsc = []
 
-    for ipos in range(pstart,sL-3-lmotif): # the BPS could close to the 3' end with only one nucleotide distance 
-    #for ipos in range(pstart,sL-14-lmotif): # the BPS could close to the 3' end with only one nucleotide distance 
+    for ipos in range(pstart,sL-3-lmotif): # the BPS could close to the 3' end with only one nucleotide distance
+    #for ipos in range(pstart,sL-14-lmotif): # the BPS could close to the 3' end with only one nucleotide distance
         pAG = sL - ipos - 5
         bpS = seq[ipos:ipos+lmotif] # bps sequence
         bpSC = cBPSC[bpS] # bps sequence score
@@ -125,14 +125,14 @@ def bppt_get_BPPTsc(seq,maxL,baseppt): # get the candidate bps and ppt and their
         if dis3 > lppt + 3: # 3 means the AG + one nucleotide distance, no U2AF can bind the downstream sequence of BPS if this is true
             pptS = seq[ipos+lmotif:sL-3] # bps sequence
             pptSC = bppt_get_pptsc(pptS,lppt,l_max_ppt,baseppt)
-        
+
         #SC = bpSC + pptSC
-        #SC = (bpSC + pptSC)*bppt_dis_pro(pAG) 
+        #SC = (bpSC + pptSC)*bppt_dis_pro(pAG)
         #SC = (bpSC * pptSC)*bppt_dis_pro(pAG)#best
         SC = (bpSC * pptSC)
         inp = bpS+"\t"+str(pAG)+"\t"+str(bpSC)+"\t"+str(pptSC)+"\t"+str(SC)
-        #print pAG
-       
+        #print(pAG)
+
         if len(orinp) == 0:
             orinp.append(inp)
         else:
@@ -197,17 +197,17 @@ def bppt_print(idd,orinp,zbps,zppt,zsc,REPORTN):
         if end > len(orinp):
             end = len(orinp)
 
-    print "#id\tbps\tbp_pos\tsc_bps\tsc_ppt\tsc\tzsc_bps\tzsc_ppt\tzsc"
+    print("#id\tbps\tbp_pos\tsc_bps\tsc_ppt\tsc\tzsc_bps\tzsc_ppt\tzsc")
     for i in range(0,end):
-        print idd+"\t"+orinp[i]+"\t"+str(zbps[i])+"\t"+str(zppt[i])+"\t"+str(zsc[i])
+        print(idd+"\t"+orinp[i]+"\t"+str(zbps[i])+"\t"+str(zppt[i])+"\t"+str(zsc[i]))
 
 def bppt_print_help():
-    print 'Usage: BP_PPT.py -b -p -i -r -h'
-    print ' -b, --pwm file    STR     The file including PWM of BPS'
-    print ' -p, --ppt file    STR     The file including the PPT score'
-    print ' -i, --FASTA file  STR     The file including the fasta sequence'
-    print ' -r, --report nu   INT     The reported sites; default=1; 0: print all positions'
-    print ' -h, --help'   
+    print('Usage: BP_PPT.py -b -p -i -r -h')
+    print(' -b, --pwm file    STR     The file including PWM of BPS')
+    print(' -p, --ppt file    STR     The file including the PPT score')
+    print(' -i, --FASTA file  STR     The file including the fasta sequence')
+    print(' -r, --report nu   INT     The reported sites; default=1; 0: print all positions')
+    print(' -h, --help')
     sys.exit()
 
 def bppt_get_options(argv):
@@ -217,7 +217,7 @@ def bppt_get_options(argv):
         sys.exit(2)
 
 
-    pwmf = pptf = fastaF = ""	
+    pwmf = pptf = fastaF = ""
     repn = 1
     for opt, arg in opts:
        if opt == '-h':
@@ -234,7 +234,7 @@ def bppt_get_options(argv):
        bppt_print_help()
 
     return(pwmf,pptf,fastaF,int(repn))
-	
+
 def main(argv):
     mL = 7
     basebp = "TACTAAC"
